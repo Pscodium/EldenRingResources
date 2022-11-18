@@ -14,6 +14,8 @@
     "@react-navigation/bottom-tabs": "^6.4.0",
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/stack": "^6.3.4",
+    "@rneui/base": "^0.0.0-edge.2",
+    "@rneui/themed": "^0.0.0-edge.2",
     "babel-plugin-inline-dotenv": "^1.7.0",
     "dotenv": "^16.0.3",
     "expo": "~47.0.3",
@@ -25,6 +27,9 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
+    "react-native-element-dropdown": "^2.4.0",
+    "react-native-paper": "^5.0.0-rc.10",
+    "react-native-vector-icons": "^9.2.0",
     "react-native-web": "~0.18.9"
   },
   "devDependencies": {
@@ -32,6 +37,7 @@
     "@types/i18n-js": "^3.8.3",
     "@types/react": "~18.0.14",
     "@types/react-native": "~0.70.6",
+    "@types/react-native-vector-icons": "^6.4.12",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "eslint": "^8.27.0",
