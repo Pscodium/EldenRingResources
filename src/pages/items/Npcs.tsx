@@ -1,26 +1,26 @@
-import { useFonts } from 'expo-font';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, ListRenderItemInfo, TouchableOpacity } from 'react-native';
-import { serviceApi, CategoryProps, invalidBearerToken } from '../services/api-service';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { List } from 'react-native-paper';
-import ImageItem from '../components/ImageItem';
+import { CategoryItems, invalidBearerToken, serviceApi } from '../../services/api-service';
 
-interface HomeProps {
+interface NpcsProps {
     navigation: Navigation;
+    route: {
+        params: { name: string };
+    };
 }
 
-export default function Home({ navigation }: HomeProps) {
-    const [categories, setCategories] = useState<CategoryProps[]>([]);
-    const [userRole, setUserRole] = useState('');
+export default function Npcs({ navigation, route }: NpcsProps) {
     const [viewHeight, setViewHeight] = useState(0);
+    const [items, setItems] = useState<CategoryItems[]>([]);
     const [fontsLoaded] = useFonts({
-        'Mantinia': require('../font/Mantinia.ttf'),
+        'Mantinia': require('../../font/Mantinia.ttf'),
     });
+    const categoryName = route.params.name;
 
     useEffect(() => {
-        getCategories();
-        getUserRole();
+        getItems();
         async function prepare() {
             await SplashScreen.preventAutoHideAsync();
         }
@@ -49,11 +49,11 @@ export default function Home({ navigation }: HomeProps) {
         return null;
     }
 
-    async function getCategories() {
+    async function getItems() {
         try {
-            const res = await serviceApi.getCategories();
+            const res = await serviceApi.getItemsCategory(categoryName);
 
-            setCategories(res);
+            setItems(res);
         } catch (err) {
             if (err instanceof invalidBearerToken) {
                 navigation.navigate('Login');
@@ -61,20 +61,12 @@ export default function Home({ navigation }: HomeProps) {
         }
     }
 
-    async function getUserRole() {
-        const res = await serviceApi.getUserData();
-
-        setUserRole(res.user.role);
-    }
-
-    function renderItem({item}: ListRenderItemInfo<CategoryProps>) {
+    function renderItem({item}: ListRenderItemInfo<CategoryItems>) {
         return (
-            <TouchableOpacity onPress={() => navigation.navigate(item.name, { name: item.name.toLowerCase()})}>
-                <View style={styles.itemView}>
-                    <Text>{item.name}</Text>
-                    <Image source={{uri: item.image}} style={styles.itemImage} />
-                </View>
-            </TouchableOpacity>
+            <View style={styles.itemView}>
+                <Text>{item.name}</Text>
+                <Image source={{uri: item.image}} style={styles.itemImage} />
+            </View>
         );
     }
 
@@ -83,21 +75,13 @@ export default function Home({ navigation }: HomeProps) {
             <View style={styles.header}>
                 <View style={{ width: "20%"}} />
                 <View style={styles.headerCenterView}>
-                    <Text style={styles.headerTitle}>Elden Ring Items</Text>
+                    <Text style={styles.headerTitle}>Npcs</Text>
                 </View>
-                <View style={styles.headerRightView}>
-                    {userRole == "default"?
-                        null
-                        :
-                        <TouchableOpacity onPress={() => navigation.navigate('Editor')}>
-                            <List.Icon color="#c4c4c4" icon="account-edit" style={styles.adminIcon}/>
-                        </TouchableOpacity>
-                    }
-                </View>
+                <View style={styles.headerRightView} />
             </View>
             <View style={styles.bodyView}>
                 <FlatList
-                    data={categories}
+                    data={items}
                     renderItem={renderItem}
                     style={[styles.listItems, {height: viewHeight}]}
                     contentContainerStyle={styles.contentList}
@@ -106,6 +90,7 @@ export default function Home({ navigation }: HomeProps) {
             </View>
         </View>
     );
+
 }
 const styles = StyleSheet.create({
     container: {
