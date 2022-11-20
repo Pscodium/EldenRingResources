@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, TextInput } fro
 import * as SplashScreen from 'expo-splash-screen';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { CategoryItems, serviceApi } from '../../services/api-service';
+import { CategoryItems, invalidBearerToken, serviceApi } from '../../services/api-service';
 import { Icon } from '@rneui/themed';
 import ImageItem from '../../components/ImageItem';
 
@@ -15,7 +15,11 @@ interface DataProps {
     singularName: string;
 }
 
-export default function Editor() {
+interface EditorProps {
+    navigation: Navigation;
+}
+
+export default function Editor({ navigation }: EditorProps) {
     const [value, setValue] = useState(null);
     const [toggleModal, setToggleModal] = useState(false);
     const [itemValue, setItemValue] = useState(null);
@@ -60,6 +64,8 @@ export default function Editor() {
     ];
 
     useEffect(() => {
+        checkAuth();
+
         async function prepare() {
             await SplashScreen.preventAutoHideAsync();
         }
@@ -74,6 +80,20 @@ export default function Editor() {
 
     if (!fontsLoaded) {
         return null;
+    }
+
+    async function checkAuth() {
+        try {
+            const res = await serviceApi.getUserData();
+
+            if (res.user.role == "default") {
+                navigation.navigate("Home");
+            }
+        } catch (err) {
+            if (err instanceof invalidBearerToken) {
+                navigation.navigate('Login');
+            }
+        }
     }
 
     async function handleCategorySelected(item: DataProps) {

@@ -2,7 +2,9 @@ import { useFonts } from 'expo-font';
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { serviceApi } from '../../services/api-service';
+import { invalidBearerToken, serviceApi } from '../../services/api-service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface LoginProps {
     navigation: Navigation;
@@ -18,6 +20,13 @@ export default function Login({navigation}: LoginProps) {
         'Mantinia': require('../../font/Mantinia.ttf'),
     });
     const [invalidInput, setInvalidInput] = useState(false);
+
+
+    useFocusEffect(
+        useCallback(() => {
+            checkAuth();
+        }, [navigation])
+    );
 
     useEffect(() => {
         async function prepare() {
@@ -49,7 +58,17 @@ export default function Login({navigation}: LoginProps) {
 
             navigation.navigate("Home");
         } catch (err) {
-            console.error(err);
+            if (err instanceof invalidBearerToken) {
+                navigation.navigate('Login');
+            }
+        }
+    }
+
+    async function checkAuth() {
+        const token = await AsyncStorage.getItem("BEARER_TOKEN");
+
+        if (token) {
+            navigation.navigate('Home');
         }
     }
 

@@ -54,6 +54,13 @@ interface UserData {
     permissions: string[];
 }
 
+interface CategoryProps {
+    id: number;
+    name: string;
+    singularName: string;
+    image: string;
+}
+
 interface CategoryItems {
     id: number | null;
     categories?: string;
@@ -192,6 +199,17 @@ class ServiceApi {
         }
     }
 
+    async getCategories(): Promise<CategoryProps[]> {
+        const token = await this.checkAuth();
+
+        const res = await fetch(`${backend_endpoint}/categories`, {
+            method: "GET",
+            headers: this.getHeaders(token, 'application/json')
+        });
+
+        return await res.json();
+    }
+
     async getItemsCategory(category: string): Promise<CategoryItems[]> {
         const token = await this.checkAuth();
 
@@ -221,7 +239,7 @@ class ServiceApi {
         description = description == ''? undefined : description;
         image = image == ''? undefined : image;
 
-        const res = await fetch(`${backend_endpoint}/${categories}/update/${id}`, {
+        await fetch(`${backend_endpoint}/${categories}/update/${id}`, {
             method: "PUT",
             headers: this.getHeaders(token, 'application/json'),
             body: JSON.stringify({
@@ -231,13 +249,8 @@ class ServiceApi {
             })
         });
 
-        if (res.status === 200) {
-            console.log('deu liga');
-        }
-
-
     }
 }
 
 export const serviceApi = new ServiceApi();
-export { Ammos, UserData, CategoryItems };
+export { Ammos, UserData, CategoryItems, CategoryProps, invalidBearerToken };
